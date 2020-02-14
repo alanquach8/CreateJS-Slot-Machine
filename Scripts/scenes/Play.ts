@@ -12,11 +12,30 @@ module scenes
         static bells = 0;
         static sevens = 0;
         static blanks = 0;
-        spinResult = [" ", " ", " "];
+
+        // money + bets
+        static playerMoney = 1000;
+        static playerMoneyLabel:objects.Label;
+        static moneyChanged = false;
+        static currentBet = 0;
+        static currentBetLabel:objects.Label;
+        bet1Button: objects.Button;
+        bet5Button: objects.Button;
+        bet10Button: objects.Button;
+        bet100Button: objects.Button;
+        static winnings = 0;
+        static winNumber = 0;
+        static lossNumber = 0;
+
+        // spin result
+        static spinResult = ["", "", ""];
 
         playLabel:objects.Label;
         //nextButton:objects.Button;
         spinButton:objects.Button;
+        resetButton:objects.Button;
+
+        
 
         // PUBLIC PROPERTIES
 
@@ -29,6 +48,11 @@ module scenes
             this.playLabel = new objects.Label();
             //this.nextButton = new objects.Button();
             this.spinButton = new objects.Button();
+            this.bet1Button = new objects.Button();
+            this.bet5Button = new objects.Button();
+            this.bet10Button = new objects.Button();
+            this.bet100Button = new objects.Button();
+            this.resetButton = new objects.Button();
 
             this.Start();
         }
@@ -40,33 +64,103 @@ module scenes
             this.playLabel = new objects.Label("Play Label", "80px","Consolas", "#000000", 320, 200, true);
             //this.nextButton = new objects.Button("./Assets/images/startButton.png", 320, 400, true);
             this.spinButton = new objects.Button("./Assets/images/startButton.png", 320, 400, true);
-           
+            this.bet1Button = new objects.Button("./Assets/images/startButton.png", 100, 100, true); // MAKE BUTTON
+            this.bet5Button = new objects.Button("./Assets/images/startButton.png", 100, 200, true); // MAKE BUTTON
+            this.bet10Button = new objects.Button("./Assets/images/startButton.png", 100, 300, true); // MAKE BUTTON
+            this.bet100Button = new objects.Button("./Assets/images/startButton.png", 100, 400, true); // MAKE BUTTON
+            scenes.Play.playerMoneyLabel = new objects.Label("$ " + scenes.Play.playerMoney, "40px","Consolas", "#000000", 0, 0, false);
+            scenes.Play.currentBetLabel = new objects.Label("$ " + scenes.Play.currentBet,"40px","Consolas", "#000000", 450, 0, false);
+            this.resetButton = new objects.Button("./Assets/images/startButton.png", 500, 400, true) // MAKE BUTTON
             this.Main();
         }        
         
         public Update(): void {
+            // if statements for changing money and everything else
+            if(scenes.Play.moneyChanged) {
+                this.removeChild(scenes.Play.playerMoneyLabel);
+                scenes.Play.playerMoneyLabel = new objects.Label("$ " + scenes.Play.playerMoney, "40px","Consolas", "#000000", 0, 0, false);
+                this.addChild(scenes.Play.playerMoneyLabel);
 
+                this.removeChild(scenes.Play.currentBetLabel);
+                scenes.Play.currentBetLabel = new objects.Label("$ " + scenes.Play.currentBet,"40px","Consolas", "#000000", 450, 0, false);
+                this,this.addChild(scenes.Play.currentBetLabel);
+
+                scenes.Play.moneyChanged = false;
+            }
         }
         
         public Main(): void {
             
             this.addChild(this.playLabel);
             this.addChild(this.spinButton);
+            this.addChild(scenes.Play.playerMoneyLabel);
+            this.addChild(scenes.Play.currentBetLabel);
+
+            this.addChild(this.bet1Button);
+            this.addChild(this.bet5Button);
+            this.addChild(this.bet10Button);
+            this.addChild(this.bet100Button);
+
+            this.addChild(this.resetButton);
 
             this.spinButton.on("click", this.SpinMachine);
-    
-            //this.addChild(this.nextButton);
-    
-            // this.nextButton.on("click", function() {
-            //    //console.log("Start Clicked!");
-            //    config.Game.SCENE_STATE = scenes.State.END;
-            // });
+            // BET BUTTONS
+            this.bet1Button.on("click", this.Bet1);
+            this.bet5Button.on("click", this.Bet5);
+            this.bet10Button.on("click", this.Bet10);
+            this.bet100Button.on("click", this.Bet100);
+
+            this.resetButton.on("click", this.ResetGame);
         }
 
+        public ResetGame(): void {
+            scenes.Play.playerMoney = 1000;
+            scenes.Play.currentBet = 0;
+            scenes.Play.moneyChanged = true;
+            scenes.Play.grapes = 0;
+            scenes.Play.bananas = 0;
+            scenes.Play.oranges = 0;
+            scenes.Play.cherries = 0;
+            scenes.Play.bars = 0;
+            scenes.Play.bells = 0;
+            scenes.Play.sevens = 0;
+            scenes.Play.blanks = 0;
+            scenes.Play.winNumber = 0;
+            scenes.Play.lossNumber = 0;
+        }
+
+        public Bet1(): void {
+            scenes.Play.playerMoney -= 1;
+            scenes.Play.currentBet += 1;
+            scenes.Play.moneyChanged = true;
+        }
+
+        public Bet5(): void {
+            scenes.Play.playerMoney -= 5;
+            scenes.Play.currentBet += 5;
+            scenes.Play.moneyChanged = true;
+        }
+        public Bet10(): void {
+            scenes.Play.playerMoney -= 10;
+            scenes.Play.currentBet += 10;
+            scenes.Play.moneyChanged = true;
+        }
+        public Bet100(): void {
+            scenes.Play.playerMoney -= 100;
+            scenes.Play.currentBet += 100;
+            scenes.Play.moneyChanged = true;
+        }
         public SpinMachine(): void {
             console.log("SPUN");
-            this.spinResult = scenes.Play.Reels();
-            console.log(this.spinResult);
+            scenes.Play.spinResult = scenes.Play.Reels();
+            console.log(scenes.Play.spinResult);
+            scenes.Play.determineWinnings();
+            scenes.Play.playerMoney += scenes.Play.winnings;
+            scenes.Play.currentBet = 0;
+            scenes.Play.moneyChanged = true;
+            // update player money
+            // reset currentBet to 0
+            
             // based on spin results: show reel spinning + generate images
 
             // FROM "main.js" IN "slotmachine-master" 
@@ -116,7 +210,7 @@ module scenes
 
             for (let spin = 0; spin < 3; spin++) {
                 outCome[spin] = Math.floor((Math.random() * 65) + 1);
-                console.log(outCome[spin]);
+                //console.log(outCome[spin]);
                 switch (outCome[spin]) {
                     case this.checkRange(outCome[spin], 1, 27):  // 41.5% probability
                         betLine[spin] = "blank";
@@ -153,6 +247,109 @@ module scenes
                 }
             }
             return betLine;
+        }
+
+        /* This function calculates the player's winnings, if any */
+        public static determineWinnings(): void
+        {
+            let blanks = 0;
+            let grapes = 0;
+            let bananas = 0;
+            let oranges = 0;
+            let cherries = 0;
+            let bars = 0;
+            let bells = 0;
+            let sevens = 0;
+            for(let i=0; i<3; i++) {
+                switch(scenes.Play.spinResult[i]) {
+                    case "blank":
+                        blanks++;
+                        break;
+                    case "Grapes":
+                        grapes++;
+                        break;
+                    case "Banana":
+                        bananas++;
+                        break;
+                    case "Orange":
+                        oranges++;
+                        break;
+                    case "Cherry":
+                        cherries++;
+                        break;
+                    case "Bar":
+                        bars++;
+                        break;
+                    case "Bell":
+                        bells++;
+                        break;
+                    case "Seven":
+                        sevens++;
+                        break;
+                }
+            }
+            if (blanks == 0)
+            {
+                if (grapes == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 10;
+                }
+                else if(bananas == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 20;
+                }
+                else if (oranges == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 30;
+                }
+                else if (cherries == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 40;
+                }
+                else if (bars == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 50;
+                }
+                else if (bells == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 75;
+                }
+                else if (sevens == 3) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 100;
+                }
+                else if (grapes == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 2;
+                }
+                else if (bananas == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 2;
+                }
+                else if (oranges == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 3;
+                }
+                else if (cherries == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 4;
+                }
+                else if (bars == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 5;
+                }
+                else if (bells == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 10;
+                }
+                else if (sevens == 2) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 20;
+                }
+                else if (sevens == 1) {
+                    scenes.Play.winnings = scenes.Play.currentBet * 5;
+                }
+                else {
+                    scenes.Play.winnings = scenes.Play.currentBet * 1;
+                }
+                scenes.Play.winNumber++;
+                console.log("Winnings: " + scenes.Play.winnings);
+                //showWinMessage();
+            }
+            else
+            {
+                scenes.Play.lossNumber++;
+                console.log("Lost");
+                scenes.Play.winnings = 0;
+                //showLossMessage();
+            }
+            
         }
         
     }
