@@ -92,21 +92,37 @@ var scenes;
             scenes.Play.lossNumber = 0;
         };
         Play.prototype.Bet1 = function () {
+            if (scenes.Play.playerMoney < 1) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 1;
             scenes.Play.currentBet += 1;
             scenes.Play.moneyChanged = true;
         };
         Play.prototype.Bet5 = function () {
+            if (scenes.Play.playerMoney < 5) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 5;
             scenes.Play.currentBet += 5;
             scenes.Play.moneyChanged = true;
         };
         Play.prototype.Bet10 = function () {
+            if (scenes.Play.playerMoney < 10) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 10;
             scenes.Play.currentBet += 10;
             scenes.Play.moneyChanged = true;
         };
         Play.prototype.Bet100 = function () {
+            if (scenes.Play.playerMoney < 100) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 100;
             scenes.Play.currentBet += 100;
             scenes.Play.moneyChanged = true;

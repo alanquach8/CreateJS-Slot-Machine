@@ -130,22 +130,38 @@ module scenes
         }
 
         public Bet1(): void {
+            if(scenes.Play.playerMoney < 1) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 1;
             scenes.Play.currentBet += 1;
             scenes.Play.moneyChanged = true;
         }
 
         public Bet5(): void {
+            if(scenes.Play.playerMoney < 5) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 5;
             scenes.Play.currentBet += 5;
             scenes.Play.moneyChanged = true;
         }
         public Bet10(): void {
+            if(scenes.Play.playerMoney < 10) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 10;
             scenes.Play.currentBet += 10;
             scenes.Play.moneyChanged = true;
         }
         public Bet100(): void {
+            if(scenes.Play.playerMoney < 100) {
+                alert("Not enough money");
+                return;
+            }
             scenes.Play.playerMoney -= 100;
             scenes.Play.currentBet += 100;
             scenes.Play.moneyChanged = true;
