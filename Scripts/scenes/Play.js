@@ -37,13 +37,13 @@ var scenes;
             this.playLabel = new objects.Label("Play Label", "80px", "Consolas", "#000000", 320, 200, true);
             //this.nextButton = new objects.Button("./Assets/images/startButton.png", 320, 400, true);
             this.spinButton = new objects.Button("./Assets/images/startButton.png", 320, 400, true);
-            this.bet1Button = new objects.Button("./Assets/images/startButton.png", 100, 100, true); // MAKE BUTTON
-            this.bet5Button = new objects.Button("./Assets/images/startButton.png", 100, 200, true); // MAKE BUTTON
-            this.bet10Button = new objects.Button("./Assets/images/startButton.png", 100, 300, true); // MAKE BUTTON
-            this.bet100Button = new objects.Button("./Assets/images/startButton.png", 100, 400, true); // MAKE BUTTON
+            this.bet1Button = new objects.Button("./Assets/images/bet1Button.png", 100, 100, true);
+            this.bet5Button = new objects.Button("./Assets/images/bet5Button.png", 100, 200, true);
+            this.bet10Button = new objects.Button("./Assets/images/bet10Button.png", 100, 300, true);
+            this.bet100Button = new objects.Button("./Assets/images/bet100Button.png", 100, 400, true);
             scenes.Play.playerMoneyLabel = new objects.Label("$ " + scenes.Play.playerMoney, "40px", "Consolas", "#000000", 0, 0, false);
             scenes.Play.currentBetLabel = new objects.Label("$ " + scenes.Play.currentBet, "40px", "Consolas", "#000000", 450, 0, false);
-            this.resetButton = new objects.Button("./Assets/images/startButton.png", 500, 400, true); // MAKE BUTTON
+            this.resetButton = new objects.Button("./Assets/images/resetButton.png", 500, 400, true);
             this.Main();
         };
         Play.prototype.Update = function () {
