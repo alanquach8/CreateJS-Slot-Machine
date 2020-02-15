@@ -131,7 +131,6 @@ var scenes;
                     for (var i = 0; i < 5; i++) {
                         this.addChild(scenes.Play.jackpotLights[i]);
                     }
-                    scenes.Play.spun = false;
                 }
                 if (scenes.Play.moneyChanged) {
                     this.removeChild(scenes.Play.playerMoneyLabel);
@@ -145,12 +144,17 @@ var scenes;
                     scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "55px", "Consolas", "#FFFFFF", 300, 30, false);
                     this.addChild(scenes.Play.jackpotLabel);
                     scenes.Play.moneyChanged = false;
+                    if (scenes.Play.spun && scenes.Play.playerMoney == 0) {
+                        config.Game.SCENE_STATE = scenes.State.END;
+                    }
+                    scenes.Play.spun = false;
                 }
             }
         };
         Play.prototype.Main = function () {
             var _a;
             this.DrawMachine();
+            this.ResetGame();
             this.spinButton.on("click", this.SpinMachine);
             // BET BUTTONS
             this.bet1Button.on("click", this.Bet1);
@@ -212,6 +216,7 @@ var scenes;
             scenes.Play.winNumber = 0;
             scenes.Play.lossNumber = 0;
             this.DrawMachine();
+            scenes.Play.spinResult = ["", "", ""];
         };
         Play.prototype.Bet1 = function () {
             if (scenes.Play.playerMoney < 1) {

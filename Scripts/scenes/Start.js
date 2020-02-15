@@ -20,25 +20,34 @@ var scenes;
         // CONSTRUCTOR
         function Start() {
             var _this = _super.call(this) || this;
+            _this.flicker = 0;
             // initialization
-            _this.startLabel = new objects.Label();
-            _this.startButton = new objects.Button();
+            _this.startScreen = new createjs.Bitmap("./Assets/images/startScreen.png");
+            _this.message = new objects.Label("CLICK ANYWHERE TO PLAY", "50px", "Consolas", "#FFFF00", 480, 680, true);
             _this.Start();
             return _this;
         }
         // PUBLIC METHODS
         Start.prototype.Start = function () {
-            this.startLabel = new objects.Label("The Game", "80px", "Consolas", "#000000", 320, 200, true);
-            this.startButton = new objects.Button("./Assets/images/startButton.png", 320, 400, true);
             this.Main();
         };
         Start.prototype.Update = function () {
+            if (this.flicker < 50) {
+                this.message.alpha -= 0.02;
+                this.flicker++;
+            }
+            else {
+                this.message.alpha += 0.02;
+                this.flicker++;
+                if (this.flicker == 100) {
+                    this.flicker = 0;
+                }
+            }
         };
         Start.prototype.Main = function () {
-            this.addChild(this.startLabel);
-            this.addChild(this.startButton);
-            this.startButton.on("click", function () {
-                //console.log("Start Clicked!");
+            this.addChild(this.startScreen);
+            this.addChild(this.message);
+            this.on("click", function () {
                 config.Game.SCENE_STATE = scenes.State.PLAY;
             });
         };

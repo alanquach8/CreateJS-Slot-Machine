@@ -20,26 +20,43 @@ var scenes;
         // CONSTRUCTOR
         function End() {
             var _this = _super.call(this) || this;
+            _this.flicker = 0;
             // initialization
-            _this.endLabel = new objects.Label();
-            _this.backButton = new objects.Button();
+            _this.endScreen = new createjs.Bitmap("./Assets/images/endScene.png");
+            _this.message1 = new objects.Label("GAME OVER", "50px", "Consolas", "#FFFF00", 480, 580, true);
+            _this.message2 = new objects.Label("CLICK ANYWHERE TO REENTER", "35px", "Consolas", "#FFFF00", 480, 680, true);
             _this.Start();
             return _this;
         }
         // PUBLIC METHODS
         End.prototype.Start = function () {
-            this.endLabel = new objects.Label("End Scene", "80px", "Consolas", "#000000", 320, 200, true);
-            this.backButton = new objects.Button("./Assets/images/startButton.png", 320, 400, true);
             this.Main();
         };
         End.prototype.Update = function () {
+            if (this.flicker < 50) {
+                this.message1.alpha -= 0.02;
+                this.message2.alpha -= 0.02;
+                this.flicker++;
+            }
+            else {
+                this.message1.alpha += 0.02;
+                this.message2.alpha += 0.02;
+                this.flicker++;
+                if (this.flicker == 100) {
+                    this.flicker = 0;
+                }
+            }
         };
         End.prototype.Main = function () {
-            this.addChild(this.endLabel);
-            this.addChild(this.backButton);
-            this.backButton.on("click", function () {
-                //console.log("Start Clicked!");
-                config.Game.SCENE_STATE = scenes.State.PLAY;
+            var cheatButton = document.getElementById("cheatButton");
+            if (cheatButton) {
+                cheatButton.style.visibility = "hidden";
+            }
+            this.addChild(this.endScreen);
+            this.addChild(this.message1);
+            this.addChild(this.message2);
+            this.on("click", function () {
+                config.Game.SCENE_STATE = scenes.State.START;
             });
         };
         return End;
