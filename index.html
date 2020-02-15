@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./Content/game.css">
     <title>CreateJS Slot Machine</title>
 </head>
 <body>
     <canvas id="canvas" width="960" height="720"></canvas>
-    <input type="checkbox" id="jackpotCheat" />
+    <div id="cheatButton">
+        <p><input type="checkbox" id="jackpotCheat" />Jackpot Cheat
+    </div>
+    
 
     <!-- Script Section -->
 
@@ -23,6 +27,7 @@
     <script src="./Scripts/config/game.js"></script>
 
     <!-- Game Objects -->
+    <script src="./Scripts/objects/JackpotLight.js"></script>
     <script src="./Scripts/objects/Label.js"></script>
     <script src="./Scripts/objects/Button.js"></script>
 

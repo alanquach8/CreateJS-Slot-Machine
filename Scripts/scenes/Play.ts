@@ -4,14 +4,14 @@ module scenes
     {
         // PRIVATE INSTANCE MEMBERS
         // slot-machine variables
-        static grapes = 0; //
+        static grapes = 0; 
         static bananas = 0;
-        static oranges = 0; //
-        static cherries = 0; //
-        static bars = 0; //
-        static bells = 0; //
-        static sevens = 0; //
-        static blanks = 0; //
+        static oranges = 0; 
+        static cherries = 0; 
+        static bars = 0; 
+        static bells = 0; 
+        static sevens = 0; 
+        static blanks = 0; 
 
         // money + bets
         static playerMoney = 1000;
@@ -30,6 +30,12 @@ module scenes
         static jackpotLabel:objects.Label;
         static winJackpot = false;
 
+        // jackpot animation
+        static jackpotLights: objects.JackpotLight[] = [new objects.JackpotLight(), new objects.JackpotLight(), new objects.JackpotLight(), new objects.JackpotLight(), new objects.JackpotLight()];
+        static jackpotWon = false;
+        static toggle = false;
+        static toggleCounter = 0;
+
         // spin result
         static spinResult = ["", "", ""];
 
@@ -41,7 +47,10 @@ module scenes
         // reel images
         static spun = false;
         static slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
-
+        static isSpinning = false;
+        static images = ["./Assets/images/spin.png", "./Assets/images/Banana.png", "./Assets/images/Bell.png",
+        "./Assets/images/blank.png", "./Assets/images/Cherry.png", "./Assets/images/Grapes.png",
+        "./Assets/images/Orange.png", "./Assets/images/Seven.png"]
 
         // PUBLIC PROPERTIES
 
@@ -73,64 +82,147 @@ module scenes
             this.bet100Button = new objects.Button("./Assets/images/bet100Button.png", 885, 575, true); 
             scenes.Play.playerMoneyLabel = new objects.Label("Money: $" + scenes.Play.playerMoney, "35px","Consolas", "#FFFFFF", 30, 550, false);
             scenes.Play.currentBetLabel = new objects.Label("Bet: $" + scenes.Play.currentBet,"35px","Consolas", "#FFFFFF", 30, 600, false);
-            scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "35px","Consolas", "#FFFFFF", 30, 30, false);
+            scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "55px","Consolas", "#FFFFFF", 300, 30, false);
             this.resetButton = new objects.Button("./Assets/images/resetButton.png", 850, 650, true);
             this.slotMachineImage = new createjs.Bitmap("./Assets/images/slotmachine.png");
             this.Main();
         }        
         
         public Update(): void {
-            // if statements for changing money and everything else
-            if(scenes.Play.spun) {
-                // reel animations
-                scenes.Play.slot[0] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[0] + ".png");
-                scenes.Play.slot[0].x = 35;
-                scenes.Play.slot[0].y = 115;
-                scenes.Play.slot[1] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[1] + ".png");
-                scenes.Play.slot[1].x = 350;
-                scenes.Play.slot[1].y = 115;
-                scenes.Play.slot[2] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[2] + ".png");
-                scenes.Play.slot[2].x = 660;
-                scenes.Play.slot[2].y = 115;
+            if(scenes.Play.isSpinning) {
+                if(scenes.Play.toggleCounter < 50) {
+                    this.removeChild(scenes.Play.slot[0]);
+                    this.removeChild(scenes.Play.slot[1]);
+                    this.removeChild(scenes.Play.slot[2]);
+                    scenes.Play.slot[0] = new createjs.Bitmap(scenes.Play.images[Math.floor((Math.random() * 8) + 1)]);
+                    scenes.Play.slot[0].x = 35;
+                    scenes.Play.slot[0].y = 115;
+                    scenes.Play.slot[1] = new createjs.Bitmap(scenes.Play.images[Math.floor((Math.random() * 8) + 1)]);
+                    scenes.Play.slot[1].x = 350;
+                    scenes.Play.slot[1].y = 115;
+                    scenes.Play.slot[2] = new createjs.Bitmap(scenes.Play.images[Math.floor((Math.random() * 8) + 1)]);
+                    scenes.Play.slot[2].x = 660;
+                    scenes.Play.slot[2].y = 115;
+                    this.addChild(scenes.Play.slot[0]);
+                    this.addChild(scenes.Play.slot[1]);
+                    this.addChild(scenes.Play.slot[2]);
+                    scenes.Play.toggleCounter++;
+                } else {
+                    scenes.Play.toggleCounter = 0;
+                    scenes.Play.isSpinning = !scenes.Play.isSpinning;
+                }
                 
-                this.addChild(scenes.Play.slot[0]);
-                this.addChild(scenes.Play.slot[1]);
-                this.addChild(scenes.Play.slot[2]);
-                this.addChild(this.slotMachineImage);
-
-                this.addChild(this.spinButton);
-                this.addChild(scenes.Play.playerMoneyLabel);
-                this.addChild(scenes.Play.currentBetLabel);
-
-                this.addChild(this.bet1Button);
-                this.addChild(this.bet5Button);
-                this.addChild(this.bet10Button);
-                this.addChild(this.bet100Button);
-
-                this.addChild(this.resetButton);
-                this.addChild(scenes.Play.jackpotLabel);
-
-                scenes.Play.spun = false;
-            }
-            if(scenes.Play.moneyChanged) {
-                this.removeChild(scenes.Play.playerMoneyLabel);
-                scenes.Play.playerMoneyLabel = new objects.Label("Money: $" + scenes.Play.playerMoney, "35px","Consolas", "#FFFFFF", 30, 550, false);
-                this.addChild(scenes.Play.playerMoneyLabel);
-
-                this.removeChild(scenes.Play.currentBetLabel);
-                scenes.Play.currentBetLabel = new objects.Label("Bet: $" + scenes.Play.currentBet,"35px","Consolas", "#FFFFFF", 30, 600, false);
-                this.addChild(scenes.Play.currentBetLabel);
-
-                this.removeChild(scenes.Play.jackpotLabel);
-                scenes.Play.jackpot = scenes.Play.currentBet * 100;
-                scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "35px","Consolas", "#FFFFFF", 30, 30, false);
-                this.addChild(scenes.Play.jackpotLabel);
-
-                scenes.Play.moneyChanged = false;
+            } else {
+                if(scenes.Play.jackpotWon) {
+                    for(let i = 0; i<5; i++) {
+                        this.removeChild(scenes.Play.jackpotLights[i]);
+                    }
+                    if(scenes.Play.toggle) {
+                        scenes.Play.toggleCounter++;
+                        scenes.Play.jackpotLights[0] = new objects.JackpotLight("./Assets/images/jackpotGreen.png", 30, 17, true);
+                        scenes.Play.jackpotLights[1] = new objects.JackpotLight("./Assets/images/jackpotBlue.png", 110, 17, true);
+                        scenes.Play.jackpotLights[2] = new objects.JackpotLight("./Assets/images/jackpotGreen.png", 190, 17, true);
+                        scenes.Play.jackpotLights[3] = new objects.JackpotLight("./Assets/images/jackpotBlue.png", 780, 17, true);
+                        scenes.Play.jackpotLights[4] = new objects.JackpotLight("./Assets/images/jackpotGreen.png", 860, 17, true);
+                        if(scenes.Play.toggleCounter == 20) {
+                            scenes.Play.toggle = !scenes.Play.toggle;
+                            scenes.Play.toggleCounter = 0;
+                        }
+                    } else {
+                        scenes.Play.toggleCounter++;
+                        scenes.Play.jackpotLights[0] = new objects.JackpotLight("./Assets/images/jackpotBlue.png", 30, 17, true);
+                        scenes.Play.jackpotLights[1] = new objects.JackpotLight("./Assets/images/jackpotGreen.png", 110, 17, true);
+                        scenes.Play.jackpotLights[2] = new objects.JackpotLight("./Assets/images/jackpotBlue.png", 190, 17, true);
+                        scenes.Play.jackpotLights[3] = new objects.JackpotLight("./Assets/images/jackpotGreen.png", 780, 17, true);
+                        scenes.Play.jackpotLights[4] = new objects.JackpotLight("./Assets/images/jackpotBlue.png", 860, 17, true);
+                        if(scenes.Play.toggleCounter == 20) {
+                            scenes.Play.toggle = !scenes.Play.toggle;
+                            scenes.Play.toggleCounter = 0;
+                        }
+                    }
+                    for(let i = 0; i<5; i++) {
+                        this.addChild(scenes.Play.jackpotLights[i]);
+                    }
+                }
+                // if statements for changing money and everything else
+                if(scenes.Play.spun) {
+                    // reel animations
+                    scenes.Play.slot[0] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[0] + ".png");
+                    scenes.Play.slot[0].x = 35;
+                    scenes.Play.slot[0].y = 115;
+                    scenes.Play.slot[1] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[1] + ".png");
+                    scenes.Play.slot[1].x = 350;
+                    scenes.Play.slot[1].y = 115;
+                    scenes.Play.slot[2] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[2] + ".png");
+                    scenes.Play.slot[2].x = 660;
+                    scenes.Play.slot[2].y = 115;
+                    
+                    this.addChild(scenes.Play.slot[0]);
+                    this.addChild(scenes.Play.slot[1]);
+                    this.addChild(scenes.Play.slot[2]);
+                    this.addChild(this.slotMachineImage);
+    
+                    this.addChild(this.spinButton);
+                    this.addChild(scenes.Play.playerMoneyLabel);
+                    this.addChild(scenes.Play.currentBetLabel);
+    
+                    this.addChild(this.bet1Button);
+                    this.addChild(this.bet5Button);
+                    this.addChild(this.bet10Button);
+                    this.addChild(this.bet100Button);
+    
+                    this.addChild(this.resetButton);
+                    this.addChild(scenes.Play.jackpotLabel);
+    
+                    for(let i = 0; i<5; i++) {
+                        this.addChild(scenes.Play.jackpotLights[i]);
+                    }
+    
+                    scenes.Play.spun = false;
+                }
+                if(scenes.Play.moneyChanged) {
+                    this.removeChild(scenes.Play.playerMoneyLabel);
+                    scenes.Play.playerMoneyLabel = new objects.Label("Money: $" + scenes.Play.playerMoney, "35px","Consolas", "#FFFFFF", 30, 550, false);
+                    this.addChild(scenes.Play.playerMoneyLabel);
+    
+                    this.removeChild(scenes.Play.currentBetLabel);
+                    scenes.Play.currentBetLabel = new objects.Label("Bet: $" + scenes.Play.currentBet,"35px","Consolas", "#FFFFFF", 30, 600, false);
+                    this.addChild(scenes.Play.currentBetLabel);
+    
+                    this.removeChild(scenes.Play.jackpotLabel);
+                    scenes.Play.jackpot = scenes.Play.currentBet * 100;
+                    scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "55px","Consolas", "#FFFFFF", 300, 30, false);
+                    this.addChild(scenes.Play.jackpotLabel);
+    
+                    scenes.Play.moneyChanged = false;
+                }
             }
         }
 
         public Main(): void {
+
+            this.DrawMachine();
+
+            this.spinButton.on("click", this.SpinMachine);
+            // BET BUTTONS
+            this.bet1Button.on("click", this.Bet1);
+            this.bet5Button.on("click", this.Bet5);
+            this.bet10Button.on("click", this.Bet10);
+            this.bet100Button.on("click", this.Bet100);
+
+            this.resetButton.on("click", this.ResetGame);
+
+            let cheatButton = document.getElementById("cheatButton");
+            if(cheatButton) {
+                cheatButton.style.visibility = "visible";
+            }
+            let jackpotCheat = <HTMLInputElement>document.getElementById("jackpotCheat");
+            jackpotCheat?.addEventListener("click", () => {
+                scenes.Play.winJackpot = jackpotCheat?.checked;
+            });
+        }
+
+        public DrawMachine(): void {
             scenes.Play.slot[0].x = 35;
             scenes.Play.slot[0].y = 115;
             scenes.Play.slot[1].x = 350;
@@ -154,21 +246,14 @@ module scenes
             this.addChild(this.resetButton);
             this.addChild(scenes.Play.jackpotLabel);
 
-            
-
-            this.spinButton.on("click", this.SpinMachine);
-            // BET BUTTONS
-            this.bet1Button.on("click", this.Bet1);
-            this.bet5Button.on("click", this.Bet5);
-            this.bet10Button.on("click", this.Bet10);
-            this.bet100Button.on("click", this.Bet100);
-
-            this.resetButton.on("click", this.ResetGame);
-
-            let jackpotCheat = <HTMLInputElement>document.getElementById("jackpotCheat");
-            jackpotCheat?.addEventListener("click", () => {
-                scenes.Play.winJackpot = jackpotCheat?.checked;
-            });
+            scenes.Play.jackpotLights[0] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 70, 55, true);
+            scenes.Play.jackpotLights[1] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 150, 55, true);
+            scenes.Play.jackpotLights[2] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 230, 55, true);
+            scenes.Play.jackpotLights[3] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 820, 55, true);
+            scenes.Play.jackpotLights[4] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 900, 55, true);
+            for(let i = 0; i<5; i++) {
+                this.addChild(scenes.Play.jackpotLights[i]);
+            }
         }
 
         public ResetGame(): void {
@@ -185,6 +270,7 @@ module scenes
             scenes.Play.blanks = 0;
             scenes.Play.winNumber = 0;
             scenes.Play.lossNumber = 0;
+            this.DrawMachine();
         }
 
         public Bet1(): void {
@@ -225,6 +311,14 @@ module scenes
             scenes.Play.moneyChanged = true;
         }
         public SpinMachine(): void {
+            if(scenes.Play.jackpotWon){
+                scenes.Play.jackpotWon = false;
+                scenes.Play.jackpotLights[0] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 70, 55, true);
+                scenes.Play.jackpotLights[1] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 150, 55, true);
+                scenes.Play.jackpotLights[2] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 230, 55, true);
+                scenes.Play.jackpotLights[3] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 820, 55, true);
+                scenes.Play.jackpotLights[4] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 900, 55, true);
+            }
             console.log("SPUN");
             scenes.Play.spinResult = scenes.Play.Reels();
             console.log(scenes.Play.spinResult);
@@ -294,6 +388,7 @@ module scenes
                 }
             }
             scenes.Play.spun = true;
+            scenes.Play.isSpinning = true;
             return betLine;
         }
 
@@ -358,6 +453,7 @@ module scenes
                 }
                 else if (sevens == 3) {
                     scenes.Play.winnings = scenes.Play.currentBet * 100;
+                    scenes.Play.jackpotWon = true;
                 }
                 else if (grapes == 2) {
                     scenes.Play.winnings = scenes.Play.currentBet * 2;
@@ -387,12 +483,10 @@ module scenes
                     scenes.Play.winnings = scenes.Play.currentBet * 1;
                 }
                 scenes.Play.winNumber++;
-                console.log("Winnings: " + scenes.Play.winnings);
             }
             else
             {
                 scenes.Play.lossNumber++;
-                console.log("Lost");
                 scenes.Play.winnings = 0;
             }
             
