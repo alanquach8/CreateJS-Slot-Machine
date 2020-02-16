@@ -3,7 +3,7 @@ module scenes
     export class Play extends objects.Scene
     {
         // PRIVATE INSTANCE MEMBERS
-        // slot-machine variables
+        // slot-machine variables and counter
         static grapes = 0; 
         static bananas = 0;
         static oranges = 0; 
@@ -14,44 +14,45 @@ module scenes
         static blanks = 0; 
 
         // money + bets
-        static playerMoney = 1000;
-        static playerMoneyLabel:objects.Label;
-        static moneyChanged = false;
-        static currentBet = 0;
-        static currentBetLabel:objects.Label;
+        static playerMoney = 1000; // Player starts with $1000
+        static playerMoneyLabel:objects.Label; // Label for showing the player money
+        static moneyChanged = false; // Boolean used to update money labels whenever necessary
+        static currentBet = 0; // Current bet, increases as player bets more money on current spin
+        static currentBetLabel:objects.Label; // Label for showing the current bet
+        // bet buttons for $1, $5, $10, and $100
         bet1Button: objects.Button;
         bet5Button: objects.Button;
         bet10Button: objects.Button;
         bet100Button: objects.Button;
-        static winnings = 0;
-        static winNumber = 0;
-        static lossNumber = 0;
-        static jackpot = 0;
-        static jackpotLabel:objects.Label;
-        static winJackpot = false;
+        static winnings = 0; // Money won on current spin
+        static winNumber = 0; // Wins (winnings > $0)
+        static lossNumber = 0; // Losses (winnings = $0)
+        static jackpot = 0; // Current jackpot amount (money won if 3 Sevens is spun)
+        static jackpotLabel:objects.Label; // Label for current jackpot amount
+        static winJackpot = false; // Boolean used to enable winning jackpot on next spin (cheat function)
 
         // jackpot animation
         static jackpotLights: objects.JackpotLight[] = [new objects.JackpotLight(), new objects.JackpotLight(), new objects.JackpotLight(), new objects.JackpotLight(), new objects.JackpotLight()];
-        static jackpotWon = false;
-        static toggle = false;
-        static toggleCounter = 0;
+        static jackpotWon = false; // Boolean used to enable jackpot animation if won
+        static toggle = false; // Used as a state for assisting in jackpot animation
+        static toggleCounter = 0; // Used as a counter for duration for assisting in jackpot animation
 
         // spin result
-        static spinResult = ["", "", ""];
+        static spinResult = ["", "", ""]; // Sesults of current spin
 
-        //nextButton:objects.Button;
+        // spin, reset, quit buttons and the slot machine
         spinButton:objects.Button;
         resetButton:objects.Button;
         slotMachineImage:createjs.Bitmap;
         quitButton:objects.Button;
         
         // reel images
-        static spun = false;
+        static spun = false; // Boolean to enable spin animation
         static slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
-        static isSpinning = false;
+        static isSpinning = false; // Boolean to disable money updates until spin animation is over
         static images = ["./Assets/images/spin.png", "./Assets/images/Banana.png", "./Assets/images/Bell.png",
         "./Assets/images/blank.png", "./Assets/images/Cherry.png", "./Assets/images/Grapes.png",
-        "./Assets/images/Orange.png", "./Assets/images/Seven.png"]
+        "./Assets/images/Orange.png", "./Assets/images/Seven.png"];
 
         // PUBLIC PROPERTIES
 
@@ -92,7 +93,7 @@ module scenes
         }        
         
         public Update(): void {
-            if(scenes.Play.isSpinning) {
+            if(scenes.Play.isSpinning) { // Spin animation
                 if(scenes.Play.toggleCounter < 50) {
                     this.removeChild(scenes.Play.slot[0]);
                     this.removeChild(scenes.Play.slot[1]);
@@ -110,13 +111,13 @@ module scenes
                     this.addChild(scenes.Play.slot[1]);
                     this.addChild(scenes.Play.slot[2]);
                     scenes.Play.toggleCounter++;
-                } else {
+                } else { // Spin animation ends
                     scenes.Play.toggleCounter = 0;
                     scenes.Play.isSpinning = !scenes.Play.isSpinning;
                 }
                 
-            } else {
-                if(scenes.Play.jackpotWon) {
+            } else { // All updates after spin animation ends
+                if(scenes.Play.jackpotWon) { // If jackpot is won, jackpot animation begins
                     for(let i = 0; i<5; i++) {
                         this.removeChild(scenes.Play.jackpotLights[i]);
                     }
@@ -148,7 +149,7 @@ module scenes
                     }
                 }
                 // if statements for changing money and everything else
-                if(scenes.Play.spun) {
+                if(scenes.Play.spun) { // Showing the results of the spin
                     // reel animations
                     scenes.Play.slot[0] = new createjs.Bitmap("./Assets/images/" + scenes.Play.spinResult[0] + ".png");
                     scenes.Play.slot[0].x = 35;
@@ -182,7 +183,7 @@ module scenes
                         this.addChild(scenes.Play.jackpotLights[i]);
                     }
                 }
-                if(scenes.Play.moneyChanged) {
+                if(scenes.Play.moneyChanged) { // Updating money and their labels
                     this.removeChild(scenes.Play.playerMoneyLabel);
                     scenes.Play.playerMoneyLabel = new objects.Label("Money: $" + scenes.Play.playerMoney, "35px","Consolas", "#FFFFFF", 30, 550, false);
                     this.addChild(scenes.Play.playerMoneyLabel);
@@ -346,9 +347,7 @@ module scenes
                 scenes.Play.jackpotLights[3] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 820, 55, true);
                 scenes.Play.jackpotLights[4] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 900, 55, true);
             }
-            console.log("SPUN");
             scenes.Play.spinResult = scenes.Play.Reels();
-            console.log(scenes.Play.spinResult);
             scenes.Play.determineWinnings();
             scenes.Play.playerMoney += scenes.Play.winnings;
             scenes.Play.currentBet = 0;
@@ -367,7 +366,9 @@ module scenes
             }
         }
         /* When this function is called it determines the betLine results.
-        e.g. Bar - Orange - Banana */
+        * e.g. Bar - Orange - Banana 
+        * adapted from slotmachine-master with modifications
+        */
         public static Reels(): string[] {
             let betLine = [" ", " ", " "];
             let outCome = [0, 0, 0];
@@ -378,7 +379,6 @@ module scenes
                 } else {
                     outCome[spin] = Math.floor((Math.random() * 65) + 1);
                 }
-                //console.log(outCome[spin]);
                 switch (outCome[spin]) {
                     case this.checkRange(outCome[spin], 1, 27):  // 41.5% probability
                         betLine[spin] = "blank";
@@ -419,7 +419,9 @@ module scenes
             return betLine;
         }
 
-        /* This function calculates the player's winnings, if any */
+        /* This function calculates the player's winnings, if any 
+        * adapted from slotmachine-master with modifications
+        */
         public static determineWinnings(): void
         {
             let blanks = 0;

@@ -5,5 +5,9 @@
 
 #cheatButton {
     visibility: hidden;
-    color: black;
+    color: white;
+}
+
+body {
+    background-image: url("/Assets/images/background.png");
 }
