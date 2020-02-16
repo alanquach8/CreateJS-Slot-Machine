@@ -28,6 +28,7 @@ var scenes;
             _this.bet100Button = new objects.Button();
             _this.resetButton = new objects.Button();
             _this.slotMachineImage = new createjs.Bitmap("./Assets/images/slotmachine.png");
+            _this.quitButton = new objects.Button();
             _this.Start();
             return _this;
         }
@@ -42,6 +43,7 @@ var scenes;
             scenes.Play.currentBetLabel = new objects.Label("Bet: $" + scenes.Play.currentBet, "35px", "Consolas", "#FFFFFF", 30, 600, false);
             scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "55px", "Consolas", "#FFFFFF", 300, 30, false);
             this.resetButton = new objects.Button("./Assets/images/resetButton.png", 850, 650, true);
+            this.quitButton = new objects.Button("./Assets/images/quitButton.png", 110, 665, true);
             this.slotMachineImage = new createjs.Bitmap("./Assets/images/slotmachine.png");
             this.Main();
         };
@@ -127,6 +129,7 @@ var scenes;
                     this.addChild(this.bet10Button);
                     this.addChild(this.bet100Button);
                     this.addChild(this.resetButton);
+                    this.addChild(this.quitButton);
                     this.addChild(scenes.Play.jackpotLabel);
                     for (var i = 0; i < 5; i++) {
                         this.addChild(scenes.Play.jackpotLights[i]);
@@ -144,21 +147,13 @@ var scenes;
                     scenes.Play.jackpotLabel = new objects.Label("JACKPOT $" + scenes.Play.jackpot, "55px", "Consolas", "#FFFFFF", 300, 30, false);
                     this.addChild(scenes.Play.jackpotLabel);
                     scenes.Play.moneyChanged = false;
-                    if (scenes.Play.spun && scenes.Play.playerMoney == 0) {
-                        for (var i = 0; i < 3; i++) {
-                            this.removeChild(scenes.Play.slot[i]);
-                        }
-                        scenes.Play.slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
-                        for (var i = 0; i < 3; i++) {
-                            this.addChild(scenes.Play.slot[i]);
-                        }
-                        config.Game.SCENE_STATE = scenes.State.END;
-                    }
+                    this.checkGameOver();
                     scenes.Play.spun = false;
                 }
             }
         };
         Play.prototype.Main = function () {
+            var _this = this;
             var _a;
             this.DrawMachine();
             this.ResetGame();
@@ -169,6 +164,16 @@ var scenes;
             this.bet10Button.on("click", this.Bet10);
             this.bet100Button.on("click", this.Bet100);
             this.resetButton.on("click", this.ResetGame);
+            this.quitButton.on("click", function () {
+                for (var i = 0; i < 3; i++) {
+                    _this.removeChild(scenes.Play.slot[i]);
+                }
+                scenes.Play.slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
+                for (var i = 0; i < 3; i++) {
+                    _this.addChild(scenes.Play.slot[i]);
+                }
+                config.Game.SCENE_STATE = scenes.State.END;
+            });
             var cheatButton = document.getElementById("cheatButton");
             if (cheatButton) {
                 cheatButton.style.visibility = "visible";
@@ -178,6 +183,18 @@ var scenes;
                 var _a;
                 scenes.Play.winJackpot = (_a = jackpotCheat) === null || _a === void 0 ? void 0 : _a.checked;
             });
+        };
+        Play.prototype.checkGameOver = function () {
+            if (scenes.Play.spun && scenes.Play.playerMoney == 0) {
+                for (var i = 0; i < 3; i++) {
+                    this.removeChild(scenes.Play.slot[i]);
+                }
+                scenes.Play.slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
+                for (var i = 0; i < 3; i++) {
+                    this.addChild(scenes.Play.slot[i]);
+                }
+                config.Game.SCENE_STATE = scenes.State.END;
+            }
         };
         Play.prototype.DrawMachine = function () {
             scenes.Play.slot[0].x = 35;
@@ -198,6 +215,7 @@ var scenes;
             this.addChild(this.bet10Button);
             this.addChild(this.bet100Button);
             this.addChild(this.resetButton);
+            this.addChild(this.quitButton);
             this.addChild(scenes.Play.jackpotLabel);
             scenes.Play.jackpotLights[0] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 70, 55, true);
             scenes.Play.jackpotLights[1] = new objects.JackpotLight("./Assets/images/jackpotGrey.png", 150, 55, true);
