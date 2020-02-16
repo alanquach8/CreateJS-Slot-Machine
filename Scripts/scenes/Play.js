@@ -145,6 +145,13 @@ var scenes;
                     this.addChild(scenes.Play.jackpotLabel);
                     scenes.Play.moneyChanged = false;
                     if (scenes.Play.spun && scenes.Play.playerMoney == 0) {
+                        for (var i = 0; i < 3; i++) {
+                            this.removeChild(scenes.Play.slot[i]);
+                        }
+                        scenes.Play.slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
+                        for (var i = 0; i < 3; i++) {
+                            this.addChild(scenes.Play.slot[i]);
+                        }
                         config.Game.SCENE_STATE = scenes.State.END;
                     }
                     scenes.Play.spun = false;
@@ -216,7 +223,6 @@ var scenes;
             scenes.Play.winNumber = 0;
             scenes.Play.lossNumber = 0;
             this.DrawMachine();
-            scenes.Play.spinResult = ["", "", ""];
         };
         Play.prototype.Bet1 = function () {
             if (scenes.Play.playerMoney < 1) {

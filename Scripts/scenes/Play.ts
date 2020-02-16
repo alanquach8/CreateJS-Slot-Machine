@@ -194,6 +194,13 @@ module scenes
     
                     scenes.Play.moneyChanged = false;
                     if(scenes.Play.spun && scenes.Play.playerMoney == 0) {
+                        for(let i = 0; i<3; i++) {
+                            this.removeChild(scenes.Play.slot[i]);
+                        }
+                        scenes.Play.slot = [new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png"), new createjs.Bitmap("./Assets/images/spin.png")];
+                        for(let i = 0; i<3; i++) {
+                            this.addChild(scenes.Play.slot[i]);
+                        }
                         config.Game.SCENE_STATE = scenes.State.END;
                     }
                     scenes.Play.spun = false;
@@ -274,7 +281,6 @@ module scenes
             scenes.Play.winNumber = 0;
             scenes.Play.lossNumber = 0;
             this.DrawMachine();
-            scenes.Play.spinResult = ["", "", ""];
         }
 
         public Bet1(): void {
