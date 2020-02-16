@@ -9,5 +9,5 @@
 }
 
 body {
-    background-image: url("/Assets/images/background.png");
+    background-image: url("../Assets/images/background.png");
 }
